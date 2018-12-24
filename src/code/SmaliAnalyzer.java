@@ -110,6 +110,7 @@ public class SmaliAnalyzer {
 					// filtering
 					for (String fullClassName : classNames) {
 						if (fullClassName != null && isFilterOk(fullClassName)) {
+							// log("fullClassName: " + fullClassName.replace("/", "."));
 							String simpleClassName = getClassSimpleName(fullClassName);
 							if (isClassOk(simpleClassName, fileName)) {
 								dependencyNames.add(simpleClassName);
@@ -133,6 +134,10 @@ public class SmaliAnalyzer {
 		} catch (IOException e) {
 			System.err.println("Cannot read " + file.getAbsolutePath());
 		}
+	}
+
+	private void log(final String text) {
+	   System.out.println(text);
 	}
 
 	private String getClassSimpleName(String fullClassName) {

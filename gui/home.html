@@ -1,0 +1,75 @@
+<html>
+    <head>
+    	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <style>
+            #drag-file {
+                color: #868686;
+                text-align: center;
+                height:150px;
+                border: 2px dashed;
+                font-size: 20px;
+                border-radius: 20px;
+				border-color: #2bbbad;
+
+				user-select: none;
+        		-moz-user-select: none;
+        		-khtml-user-select: none;
+        		-webkit-user-select: none;
+        		-o-user-select: none;
+            }
+
+            #drag-title {
+            	position: relative;
+            	top: 22%;
+            }
+
+			#btn-preview {
+                width: 100%;
+				margin-top: 23px;
+			}
+
+			.body-page {
+                margin-top: 21px;
+                margin-bottom: 16px;
+				padding-left: 16px;
+				padding-right: 16px;
+			}
+
+    	</style>
+    </head>
+    <body class="body-page"> 
+        <div id="drag-file">
+            <p id="drag-title">Drag your APK here!</p>
+        </div>
+
+        <div class="input-field">
+          <input 
+			id="input-filter"
+			placeholder="Enter filter"
+		    id="first_name"
+		    type="text"
+			class="validate">
+        </div>
+
+
+        <label>
+        	<input 
+            	id="checkbox-inner-class"
+				type="checkbox"
+			 	class="filled-in"
+				checked="checked" />
+        	<span>Show Inner Classes</span>
+        </label>
+
+
+        <a 
+            id="btn-preview"
+            :wq
+            class="waves-effect waves-light btn-large">
+            PREVIEW  
+        </a>
+
+        <br/>
+        <script src="home.js" type="text/javascript" charset="utf-8"></script>
+    </body>
+</html>

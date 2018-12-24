@@ -17,11 +17,11 @@ public class ArgumentReader {
 	}
 
 	public Arguments read() {
-		if (args.length != 5 && args.length != 8) {
-			System.err.println(USAGE_STRING);
-			return null;
-		}
-		String projectPath = null, resultPath = null, filter = null;
+		// if (args.length != 5 && args.length != 8) {
+		// 	System.err.println(USAGE_STRING);
+		// 	return null;
+		// }
+		String projectPath = null, resultPath = null, filter = null, apkPath = null;
 		boolean withInnerClasses = false;
 		for (int i = 0; i < args.length; i++) {
 			if (i < args.length - 1) {
@@ -33,6 +33,8 @@ public class ArgumentReader {
 					filter = args[i + 1];
 				} else if (args[i].equals("-d")) {
 					withInnerClasses = Boolean.valueOf(args[i + 1]);
+				} else if (args[i].equals("-a")) {
+					apkPath = args[i + 1];
 				}
 			}
 		}
@@ -45,18 +47,23 @@ public class ArgumentReader {
 			filter = null;
 			System.out.println("Warning! Processing without filter.");
 		}
-		File projectFile = new File(projectPath);
-		if (!projectFile.exists()) {
-			System.err.println(projectPath + " doesn't exist!");
-			return null;
-		}
-		if (!projectFile.isDirectory()) {
-			System.err.println(projectPath + " must be a directory!");
-			return null;
-		}
+		// File projectFile = new File(projectPath);
+		// if (!projectFile.exists()) {
+		// 	System.err.println(projectPath + " doesn't exist!");
+		// 	return null;
+		// }
+		// if (!projectFile.isDirectory()) {
+		// 	System.err.println(projectPath + " must be a directory!");
+		// 	return null;
+		// }
 		if (!withInnerClasses) {
 			System.out.println("Warning! Processing without inner classes.");
 		}
-		return new Arguments(projectPath, resultPath, filter, withInnerClasses);
+		File apkFile = new File(apkPath);
+		if (!apkFile.exists()) {
+			System.out.println(apkFile + " doesn't exist!!!");
+		}
+
+		return new Arguments(apkPath, projectPath, resultPath, filter, withInnerClasses);
 	}
 }

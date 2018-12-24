@@ -10,3 +10,4 @@ build
 output
 test.*
 apk-dependency-graph-scripts-*.zip
+node_modules

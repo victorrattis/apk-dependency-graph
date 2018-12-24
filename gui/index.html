@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="Scripts/sidr/stylesheets/jquery.sidr.dark.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Allow import works for both browser and electron with the same code -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
     <!--Import jQuery before materialize.js-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <!-- Compiled and minified JavaScript -->
@@ -18,6 +22,8 @@
     <script type="text/javascript" src="Scripts/sidr/jquery.sidr.js"></script>
     <script type="text/javascript" src="Scripts/underscore/underscore-min.js"></script>
     <script type="text/javascript" src="Scripts/d3/d3.v3.js"></script>
+
+    <script>if (window.module) module = window.module;</script>
 
     <style type="text/css" media="screen">
         body {

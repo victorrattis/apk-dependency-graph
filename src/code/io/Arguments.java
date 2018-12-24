@@ -6,9 +6,13 @@ public class Arguments {
 	private String resultPath;
 	private String filter;
 	private boolean withInnerClasses;
+	private String apkFilePath;
 	
-	public Arguments(String projectPath, String resultPath, String filter, boolean withInnerClasses) {
+	public Arguments(
+			String apkPath, String projectPath, String resultPath, 
+			String filter, boolean withInnerClasses) {
 		super();
+		this.apkFilePath = apkPath;
 		this.projectPath = projectPath;
 		this.resultPath = resultPath;
 		this.filter = filter;
@@ -37,5 +41,8 @@ public class Arguments {
 	}
 	public void setWithInnerClasses(boolean withInnerClasses) {
 		this.withInnerClasses = withInnerClasses;
+	}
+	public String getApkFilePath() {
+		return this.apkFilePath;
 	}
 }
