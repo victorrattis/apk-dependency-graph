@@ -1,13 +1,9 @@
 .settings/
 .classpath
 .project
-*.class
-analyzed.js
 .DS_Store
 .idea
 META-INF
-build
-output
 test.*
 apk-dependency-graph-scripts-*.zip
-node_modules
+.vscode

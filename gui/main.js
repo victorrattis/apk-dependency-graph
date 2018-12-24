@@ -1,112 +1,86 @@
-let { app, BrowserWindow, ipcMain } = require('electron');
 
-let mainWindow
+let { app, BrowserWindow, ipcMain } = require('electron');
+let fs = require('fs');
+
+let mainWindow;
 
 const APP_TITLE = "APK Dependency Graph"
 const DEV_MODE = false;
 
-function checkEnverinment() {
-	console.log("res path: " + process.resourcesPath);
-}
-checkEnverinment();
-
 function createWindow () {
-  const electron = require('electron');
-  var screenElectron = electron.screen;
-  var mainScreen = screenElectron.getPrimaryDisplay();
-  var dimensions = mainScreen.size;
+  	// Create the browser window.
+  	mainWindow = new BrowserWindow({
+    	width: 360, 
+    	height: 380, 
+    	title: APP_TITLE,
+    	resizable: DEV_MODE,
+    	useContentSize: true
+  	});
 
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 360, 
-    height: 380, 
-    title: APP_TITLE,
-    resizable: DEV_MODE,
-    useContentSize: true
-  });
+  	if (!DEV_MODE) {
+  		// Disable menu bar.
+  		mainWindow.setMenu(null);
+  	}
 
-  if (!DEV_MODE) {
-  	// Disable menu bar.
-  	mainWindow.setMenu(null);
-  }
+  	// Load the index.html of the app.
+  	mainWindow.loadFile('home.html');
 
-  // Load the index.html of the app.
-  mainWindow.loadFile('home.html')
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+  	// Emitted when the window is closed.
+  	mainWindow.on('closed', function () {
+    	mainWindow = null;
+  	});
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
-// Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+  	// On macOS it is common for applications and their menu bar
+  	// to stay active until the user quits explicitly with Cmd + Q
+  	if (process.platform !== 'darwin') {
+    	app.quit();
+  	}
+});
 
 app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
-
-ipcMain.on('open-page-html', (event, file) => {
-  // generateApkDependencyGraph();
+  	// On macOS it's common to re-create a window in the app when the
+  	// dock icon is clicked and there are no other windows open.
+  	if (mainWindow === null) {
+    	createWindow();
+  	}
 });
 
 ipcMain.on('load-apk-dependency-graph', (event, config) => {
-  console.log(config);
-  generateApkDependencyGraph(
-    config,
-    () => {
-      console.log("completed!");
-      openPagePreview();
-    }, 
-    (error) => {
-      console.log('exec error: ' + error);
-    });
+	console.log(config);
+  	runDependencyGraph(
+  		config,
+  		() => {
+      		console.log("completed!");
+      		openDependecyGraphPreview();
+    	}, 
+    	(error) => {
+      		console.log('exec error: ' + error);
+    	});
 });
 
-// ./run.sh '/home/vhra/Documents/analise-apk/sticky-session.apk' br.org.cesar true
+function openDependecyGraphPreview() {
+	const { screen } = require('electron');
+	let mainScreen = screen.getPrimaryDisplay();
+	let dimensions = mainScreen.size;
 
-function openPagePreview() {
-  const electron = require('electron');
-  var screenElectron = electron.screen;
-  var mainScreen = screenElectron.getPrimaryDisplay();
-  var dimensions = mainScreen.size;
+	let page = new BrowserWindow({
+    	width: dimensions.width, 
+    	height: dimensions.height
+  	});
+  	page.loadFile("index.html");
+  	page.setMenu(null);
 
-  let page = new BrowserWindow({
-    width: dimensions.width, 
-    height: dimensions.height
-  });
-  page.loadFile("index.html");
-  page.setMenu(null);
+  	page.on('closed', function () {
+  		console.log("close page preview!");
+    	page = null
+  	});
 
-  page.on('closed', function () {
-    page = null
-  })
-
-  mainWindow.close();
+  	mainWindow.close();
 }
-
-var fs = require('fs');
 
 function getApkDenpendencyLibPath() {
     let currentDir = process.resourcesPath;
@@ -121,24 +95,53 @@ function getApkDenpendencyLibPath() {
     }   
 }
 
-function generateApkDependencyGraph(config, onComplete, onError) {
-  var exec = require('child_process').exec, child;
-  // child = exec('java -jar ~/Applications/example.jar',
-  // child = exec("./../run.sh '/home/vhra/Documents/analise-apk/sticky-session.apk' br.org.cesar true",
-  let filter = config.filter != undefined ? config.filter : "";
-
-  child = exec(`./../run.sh ${config.apkFile} ${filter} ${config.isInnerEnabled}`,
-    function (error, stdout, stderr){
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if(error !== null){
-        onError(error);
-        
-      } else {
-        onComplete();
-        // openPagePreview();
-      }
-  });
+const hasApkDependencyGraphLib = () => {
+	return fs.existsSync("lib/apk-dependency-graph.jar")
 }
 
+const runDependencyGraph = (config, onComplete, onError) => {
+	if (!hasApkDependencyGraphLib()) {
+		onError("Without apk-dependency-graph jar!");
+		return;
+	}
+
+	let command = makeDependencyGraphCommand(
+			config.apkFile,
+			config.filter != undefined ? config.filter : "",
+			config.isInnerEnabled);
+
+	console.log(command);
+	runCommand(command, onComplete, onError);
+}
+
+const makeDependencyGraphCommand = (fileName, filter, isInner) => {
+	let path = require("path");
+	let extension = path.extname(fileName);
+	let xpref = path.basename(fileName, extension);
+
+	let dir = __dirname;
+	let jsonPath = `${dir}/analyzed.js`;
+	let outPath = `${dir}/output/${xpref}`;
+	let libPath = `${dir}/lib/apk-dependency-graph.jar`;
+
+	return `java -jar ${libPath} -i ${outPath} -a ${fileName} -o ${jsonPath} -f ${filter} -d ${isInner}`;
+}
+
+const runCommand = (command, onComplete, onError) => {
+	if (command == undefined || command === "") {
+		onError("Without command to run!");
+		return;
+	}
+
+	let { exec } = require('child_process');
+	exec(command, (error, stdout, stderr) => {
+			console.log('stdout: ' + stdout);
+      		console.log('stderr: ' + stderr);
+      		if(error !== null){
+        		onError(error);
+      		} else {
+        		onComplete();
+      		}
+		});
+}
 
