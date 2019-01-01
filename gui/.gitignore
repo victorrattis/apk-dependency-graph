@@ -2,3 +2,5 @@ lib
 node_modules
 output
 analyzed.js
+
+release-builds

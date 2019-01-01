@@ -17,10 +17,6 @@ public class ArgumentReader {
 	}
 
 	public Arguments read() {
-		// if (args.length != 5 && args.length != 8) {
-		// 	System.err.println(USAGE_STRING);
-		// 	return null;
-		// }
 		String projectPath = null, resultPath = null, filter = null, apkPath = null;
 		boolean withInnerClasses = false;
 		for (int i = 0; i < args.length; i++) {
@@ -47,15 +43,6 @@ public class ArgumentReader {
 			filter = null;
 			System.out.println("Warning! Processing without filter.");
 		}
-		// File projectFile = new File(projectPath);
-		// if (!projectFile.exists()) {
-		// 	System.err.println(projectPath + " doesn't exist!");
-		// 	return null;
-		// }
-		// if (!projectFile.isDirectory()) {
-		// 	System.err.println(projectPath + " must be a directory!");
-		// 	return null;
-		// }
 		if (!withInnerClasses) {
 			System.out.println("Warning! Processing without inner classes.");
 		}

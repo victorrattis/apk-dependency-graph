@@ -107,7 +107,7 @@ final public class SmaliDecoder {
 
     private List<String> getDexFiles(String apkFilePath) throws IOException {
         return ZipFileUtils.filterByContainsName(apkFilePath, "classes");
-            }
+    }
 
     private void log(final String text) {
         System.out.println(text);
