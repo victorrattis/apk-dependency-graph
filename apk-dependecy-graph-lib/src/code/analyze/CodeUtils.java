@@ -1,4 +1,6 @@
-package code;
+package code.analyze;
+
+import code.util.StringUtils;
 
 public class CodeUtils {
 

@@ -1,83 +1,39 @@
 package code;
 
-
-import java.io.File;
-
+import code.decode.ApkSmaliDecoderController;
 import code.io.ArgumentReader;
 import code.io.Arguments;
 import code.io.Writer;
-import java.io.IOException;
+import code.util.FileUtils;
+import code.analyze.SmaliAnalyzer;
 
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.File;
 
 public class Main {
-	
-	public static void main(String[] args) {
-		Arguments arguments = new ArgumentReader(args).read();
-		if (arguments == null) {
-			return;
-		}
+    public static void main(String[] args) {
+        Arguments arguments = new ArgumentReader(args).read();
+        if (arguments == null) {
+            return;
+        }
 
-		final String ApkFilePath = arguments.getApkFilePath();
-		final String outputFilePath = arguments.getProjectPath();
+        // Delete the output directory for a better decoding result.
+        if (FileUtils.deleteDir(arguments.getProjectPath())) {
+            log("The output directory was deleted successfully!");
+        }
 
-		// clear output dir;
-		File outputFile = new File(outputFilePath);
-		if (outputFile.exists()) {
-			boolean result = deleteDirectory(outputFile);
-			log("Was output dir deleted: " + result);
-		}
+        // Decode the APK file for smali code in the output directory.
+        ApkSmaliDecoderController.decode(
+            arguments.getApkFilePath(), arguments.getProjectPath());
 
-		List<String> classeFiles = getClassesFiles(ApkFilePath);
-		for (String fileName : classeFiles) {
-			log("Smali Decoding: " + fileName);
-			SmaliDecoder.decode(
-					new File(ApkFilePath),
-					new File(outputFilePath),
-					fileName,
-					28);
-		}
+        File resultFile = new File(arguments.getResultPath());
+        SmaliAnalyzer analyzer = new SmaliAnalyzer(arguments);
+        if (analyzer.run()) {
+            new Writer(resultFile).write(analyzer.getDependencies());
+            log("Success! Now open index.html in your browser.");
+        }
+    }
 
-		File resultFile = new File(arguments.getResultPath());
-		SmaliAnalyzer analyzer = new SmaliAnalyzer(arguments);
-		if (analyzer.run()) {
-			new Writer(resultFile).write(analyzer.getDependencies());
-			log("Success! Now open index.html in your browser.");
-		}
-	}
-
-	private static boolean deleteDirectory(final File dir) {
-		File[] allContents = dir.listFiles();
-		if (allContents != null) {
-			for (File file : allContents) {
-				deleteDirectory(file);
-			}
-		}
-		return dir.delete();
-	}
-
-	private static void log(final String text) {
-		System.out.println(text);
-	}
-
-	public static List<String> getClassesFiles(final String apkFilePath) {
-		List<String> files = new ArrayList<>();
-		try {
-			ZipFile zipFile = new ZipFile(apkFilePath);
-			Enumeration zipEntries = zipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				String fileName = ((ZipEntry) zipEntries.nextElement()).getName();
-				if (fileName.contains("classes")) {
-					files.add(fileName);
-				}
-			}
-		} catch (IOException iOException) {
-			iOException.printStackTrace();
-		}
-		return files;
-	}
+    private static void log(final String text) {
+        System.out.println(text);
+    }
 }

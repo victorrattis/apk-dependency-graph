@@ -1,4 +1,4 @@
-package code;
+package code.analyze;
 
 import java.io.BufferedReader;
 import java.io.File;
