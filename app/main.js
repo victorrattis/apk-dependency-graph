@@ -1,6 +1,7 @@
 
 let { app, BrowserWindow, ipcMain } = require('electron');
 let fs = require('fs');
+const path = require('path');
 
 let mainWindow;
 
@@ -96,14 +97,18 @@ function getApkDenpendencyLibPath() {
 }
 
 const hasApkDependencyGraphLib = () => {
-	return fs.existsSync("lib/apk-dependency-graph.jar")
+	return fs.existsSync(getApkDependencyAnalizerPath());
+}
+
+const getApkDependencyAnalizerPath = () => {
+    return path.join(__dirname, "lib/apk-dependency-graph.jar");
 }
 
 const runDependencyGraph = (config, onComplete, onError) => {
-	if (!hasApkDependencyGraphLib()) {
-		onError("Without apk-dependency-graph jar!");
-		return;
-	}
+    if (!hasApkDependencyGraphLib()) {
+        onError("Without apk-dependency-graph jar!");
+        return;
+    }
 
 	let command = makeDependencyGraphCommand(
 			config.apkFile,
@@ -115,14 +120,13 @@ const runDependencyGraph = (config, onComplete, onError) => {
 }
 
 const makeDependencyGraphCommand = (fileName, filter, isInner) => {
-	let path = require("path");
 	let extension = path.extname(fileName);
 	let xpref = path.basename(fileName, extension);
 
 	let dir = __dirname;
 	let jsonPath = `${dir}/analyzed.js`;
 	let outPath = `${dir}/output/${xpref}`;
-	let libPath = `${dir}/lib/apk-dependency-graph.jar`;
+	let libPath = getApkDependencyAnalizerPath();
 
 	return `java -jar ${libPath} -i ${outPath} -a ${fileName} -o ${jsonPath} -f ${filter} -d ${isInner}`;
 }
