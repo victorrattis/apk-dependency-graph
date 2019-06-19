@@ -1,0 +1,73 @@
+plugins {
+    id 'base'
+    id "com.moowork.node" version "1.3.1"
+}
+
+node {
+    // Using the LTS versions for nodejs and npm tools
+    version = '10.16.0'
+    npmVersion = '6.9.0'
+
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+}
+
+npm_run_build {
+    inputs.files fileTree("src")
+    inputs.file 'package.json'
+    inputs.file 'package-lock.json'
+}
+assemble.dependsOn npm_run_build
+
+task start(type: NpmTask) {
+    args = ['run', 'start']
+}
+
+task clean_all(type: Delete) {
+    delete "output", "node_modules", 'dist'
+}
+clean.dependsOn clean_all
+
+task package_linux(type: NpmTask) {
+    args = ['run', 'package-linux64']
+}
+package_linux.dependsOn build
+
+task package_win(type: NpmTask) {
+    args = ['run', 'package-win']
+}
+package_win.dependsOn build
+
+task package_mac(type: NpmTask) {
+    args = ['run', 'package-mac']
+}
+package_mac.dependsOn build
+
+task package_all(type: NpmTask) {
+    args = ['run', 'package-all']
+}
+package_all.dependsOn build
+
+task installer_deb64(type: NpmTask) {
+    args = ['run', 'create-installer-deb64']
+}
+installer_deb64.dependsOn package_linux
+
+task installer_mac(type: NpmTask) {
+    args = ['run', 'create-installer-mac']
+}
+installer_mac.dependsOn package_mac
+
+task installer_win(type: NpmTask) {
+    args = ['run', 'create-installer-win']
+}
+installer_win.dependsOn package_win
+
+task release() {
+    doLast {
+        println "Release completed!"
+    }
+}
+release.dependsOn installer_deb64
+

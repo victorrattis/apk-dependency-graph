@@ -1,8 +1,51 @@
-ant.importBuild 'build.xml'
-
-task build {
-    dependsOn resolve
-    dependsOn jar
-    // https://stackoverflow.com/a/32909428/9765252
-    tasks.findByName('jar').mustRunAfter 'resolve'
+// Apply the java plugin to add support for Java.
+plugins {
+    id 'java'
+    id 'application'
 }
+
+// In this section you declare where to find the dependencies of your project.
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+mainClassName = "code.Main"
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.smali/baksmali
+    compile group: 'org.smali', name: 'baksmali', version: '2.2.5'
+
+    compile project(':gui')
+}
+
+jar {
+    // Main-Class attribute in the manifest file.
+    manifest {
+        attributes(
+            'Class-Path': configurations.compile.collect { 
+                it.getName()
+            }.join(' '),
+            'Main-Class': mainClassName
+        )
+    }
+
+    // Include all dependencies into the jar (flat jar).
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task copyJar(type: Copy) {
+    from file("$buildDir/libs/apk-dependency-graph.jar")
+    into file("gui/lib")
+}
+build.dependsOn copyJar

@@ -1,6 +1,7 @@
 
 const { BrowserWindow } = require('electron')
 const { ApkDependencyController } = require('./apk-dependency-analyzer-controller')
+const AppStore = require('./../util/app-store')
 
 const HOME_WINDOW_WIDTH  = 360
 const HOME_WINDOW_HEIGHT = 380
@@ -10,8 +11,9 @@ class HomeBrowserWindow {
         this.devMode = info.devMode != undefined ? info.devMode : false
         this.title = info.title != undefined ? info.title : ""
         this.window = null
-        this.apkDependencyController =
-                new ApkDependencyController(app.getAppPath())
+
+        const appStore = new AppStore();
+        this.apkDependencyController = new ApkDependencyController(appStore)
     }
 
     open() {

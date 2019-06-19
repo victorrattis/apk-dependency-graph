@@ -1,33 +1,28 @@
 
-const fs = require('fs')
 const path = require('path')
 const { exec } = require('child_process')
 
-const hasApkDependencyGraphJar = (currentDir) => 
-    fs.existsSync(getApkDependencyGraphJarPath(currentDir))
-
-const getApkDependencyGraphJarPath = (currentDir) =>
-    path.join(currentDir, "lib/apk-dependency-graph.jar")
-
-const makeDependencyGraphCommand = (currentDir, fileName, filter, isInner) => {
+const makeDependencyGraphCommand = 
+        (appStore, fileName, filter, isInner) => {
     const extension = path.extname(fileName)
     const xpref = path.basename(fileName, extension)
 
-    const jsonPath = `${currentDir}/analyzed.js`
-    const outPath = `${currentDir}/output/${xpref}`
-    const libPath = getApkDependencyGraphJarPath(currentDir)
+    const jsonPath = appStore.getAnalyzedJsPath();
+    const outPath = `${appStore.getOutputPath()}/${xpref}`
+    const libPath = appStore.getApkDependencyGraphPath()
 
     return `java -jar ${libPath} -i ${outPath} -a ${fileName} -o ${jsonPath} -f ${filter} -d ${isInner}`
 }
 
 class ApkDependencyGraphRunner {
-    constructor(currentDir) {
-        this.currentDir = currentDir
+    constructor(appStore) {
+        this.appStore = appStore
     }
 
     run(config) {
         return new Promise((resolve, reject) => {
-            if (!hasApkDependencyGraphJar(this.currentDir)) {
+            if (!this.appStore.hasApkDependencyGraphJar()) {
+                console.log(this.appStore.getApkDependencyGraphPath());
                 reject("Without apk-dependency-graph jar!")
                 return
             }
@@ -42,7 +37,7 @@ class ApkDependencyGraphRunner {
             }
 
             const command = makeDependencyGraphCommand(
-                this.currentDir,
+                this.appStore,
                 config.apkFile,
                 config.filter != undefined ? config.filter : "",
                 config.isInnerEnabled)

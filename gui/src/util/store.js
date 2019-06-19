@@ -3,7 +3,7 @@ const electron = require('electron')
 const path = require('path')
 const fs = require('fs')
 
-const readFileAsJson = (filePath, defaults) => new Promise((resolve, reject) => {
+const readFileAsJson = (filePath, defaults) => new Promise((resolve) => {
     fs.readFile(filePath, (error, data) => {
         if (error) {
             resolve(defaults)
@@ -20,7 +20,8 @@ const readFileAsJson = (filePath, defaults) => new Promise((resolve, reject) => 
   
 class Store {
     constructor(opts) {
-        const userDataPath = (electron.app || electron.remote.app).getPath('userData')
+        const app = (electron.app || electron.remote.app)
+        const userDataPath = app.getPath('userData')
         this.path = path.join(userDataPath, opts.configName + '.json')
         this.data = {}
         this.defaults = opts.defaults

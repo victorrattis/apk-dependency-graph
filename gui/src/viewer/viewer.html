@@ -47,7 +47,17 @@
 <body>
 <!--script type="text/javascript" src="Scripts/jquery/jquery-2.1.4.min.js"></script-->
 
-<script type="text/javascript" src="../../analyzed.js"></script>
+<!-- script type="text/javascript" src="../../analyzed.js"></script -->
+<script type="text/javascript">
+    (function loadAnalyzedDependencyGraphFile() {
+        const AppStore = require('./../util/app-store')
+        const appStore = new AppStore();
+
+        let script = document.createElement("script");
+        script.src = appStore.getAnalyzedJsPath();
+        document.head.appendChild(script);
+    })();
+</script>
 
 <!-- ================================================= -->
 <!-- ===========ACTUAL HTML           ================ -->

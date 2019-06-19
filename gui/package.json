@@ -5,10 +5,16 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds",
-    "package-win": "electron-packager . ApkDendepency --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"CryptoApp\"",
-    "package-linux": "electron-packager . ApkDendepency --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
-    "package-all": "npm run package-linux & package-win & package-mac"
+    "build": "",
+    "package-mac": "electron-packager . $npm_package_name --overwrite --platform=darwin --arch x64 --prune=true --out dist/",
+    "package-win": "electron-packager . $npm_package_name --platform win32 --arch x64 --out dist/",
+    "package-linux64": "electron-packager . $npm_package_name --overwrite --platform linux --arch x64 --prune true --out dist/",
+    "package-all": "npm run package-linux64 & package-win & package-mac",
+    "create-installer-all": "create-installer-deb64",
+    "create-installer-deb64": "electron-installer-debian --src dist/$npm_package_name-linux-x64/ --dest dist/installers/ --arch amd64",
+    "create-installer-mac": "electron-installer-dmg ./dist/$npm_package_name-darwin-x64/$npm_package_name.app $npm_package_name --out=dist/installers/",
+    "create-installer-win": "electron-installer-windows --src dist/apk-dependecy-graph-win32-x64/ --dest dist/installers/",
+    "test1": "electron-builder --linux"
   },
   "repository": "",
   "keywords": [
@@ -20,11 +26,32 @@
     "graph",
     "java"
   ],
-  "author": "Alex Zaitsev",
+  "author": {
+    "name": "Alex Zaitsev",
+    "email": "something@gmail.com"
+  },
+  "homepage": "https://www.apk-depedency-graph.com",
   "license": "Apache-2.0",
   "dependencies": {},
   "devDependencies": {
     "electron": "^4.0.1",
-    "electron-packager": "^13.0.1"
+    "electron-builder": "^20.44.4",
+    "electron-installer-debian": "^2.0.0",
+    "electron-installer-dmg": "^3.0.0",
+    "electron-installer-windows": "^2.0.0",
+    "electron-packager": "^13.0.1",
+    "electron-winstaller": "^3.0.4"
+  },
+  "build": {
+    "productName": "apk-dependecy-graph",
+    "appId": "apk-dependecy-graph",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "asar": "true",
+      "asarUnpack": "lib/",
+      "target": "deb"
+    }
   }
 }

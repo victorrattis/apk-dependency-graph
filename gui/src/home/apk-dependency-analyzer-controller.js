@@ -32,8 +32,8 @@ function throwException(message) {
  *  instead of the Renderer process.
  */
 class ApkDependencyController {
-    constructor(appPath) {
-        this.runner = new ApkDependencyGraphRunner(appPath)
+    constructor(appStore) {
+        this.runner = new ApkDependencyGraphRunner(appStore)
     }
 
     /**

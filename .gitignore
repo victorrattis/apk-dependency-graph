@@ -9,6 +9,7 @@ META-INF
 build
 output
 test.*
+dist
 apk-dependency-graph-scripts-*.zip
 .ant
 .gradle
